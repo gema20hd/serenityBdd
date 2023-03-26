@@ -1,0 +1,54 @@
+name: $(SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.r)
+
+resources:
+  repositories:
+  - repository: self
+  - repository: qa-pipeline-templates
+    type: git
+    name: BP-DevOps-Infrastructure/common-pipeline-template-sqa
+    ref: master
+  - repository: qa-utils-templates
+    type: git
+    name: BP-Quality-Management/common-pipeline-template-sqa
+    ref: master
+
+trigger:
+  - master
+
+parameters:
+  - name: FLUJO
+    displayName: 'Flujo a ejecutar'
+    default: TodosWeb
+    values:
+      - TodosWeb
+      - TodosAPI
+      - Saucedemo
+      - SimulacionCompraTelefono
+      - BancaMovil
+      - TCS
+      - GraphQL
+      - ManualTest
+      - ParallelTest
+      - RestAssuredApi
+      - Database
+      
+  - name: TIPO_TEST
+    displayName: 'Elija el tipo de test'
+    default: cucumber   
+    values:
+      - cucumber
+      - karate
+
+variables:
+  - group: USUARIO_GENERICO
+  - group: JIRA_AUTOMATIZACION
+  - group: VARIABLES_TEST
+  - group: SONAR2
+  - group: VARIABLES_TEST_SERENITY
+           
+stages:
+  - template: serenity/init.yml@qa-pipeline-templates
+    parameters:
+      FLUJO: ${{parameters.FLUJO}}
+      TIPO_TEST: ${{parameters.TIPO_TEST}}
+      TEST_EXTRA_PARAMETERS: ""
